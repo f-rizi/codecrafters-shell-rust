@@ -1,3 +1,5 @@
+mod command;
+
 #[allow(unused_imports)]
 use std::io::{self, Write};
 
