@@ -13,6 +13,9 @@ fn main() {
 
         let input = input.trim();
 
+        if input.starts_with("exit") {
+            break;
+        }
         if !input.starts_with("invalid") {
             println!("{}", input);
         } else {
