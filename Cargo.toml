@@ -9,3 +9,9 @@ rust-version = "1.80"
 anyhow = "1.0.68"                                # error handling
 bytes = "1.3.0"                                  # helps manage buffers
 thiserror = "1.0.38"                             # error handling
+tokio = { version = "1.23.0", features = ["full"] }
+futures = "0.3"
+rand = "0.8"
+env_logger = "0.11.6"
+log = "0.4"
+once_cell = "1.18.0"
