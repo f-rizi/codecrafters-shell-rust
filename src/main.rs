@@ -2,18 +2,21 @@
 use std::io::{self, Write};
 
 fn main() {
-    print!("$ ");
-    io::stdout().flush().unwrap();
+    loop {
+        print!("$ ");
+        io::stdout().flush().unwrap();
 
-    let stdin = io::stdin();
-    let mut input = String::new();
-    stdin.read_line(&mut input).unwrap();
+        let stdin = io::stdin();
 
-    let input = input.trim();
+        let mut input = String::new();
+        stdin.read_line(&mut input).unwrap();
 
-    if !input.starts_with("invalid") {
-        println!("{}", input);
-    } else {
-        println!("{}: command not found", input);
+        let input = input.trim();
+
+        if !input.starts_with("invalid") {
+            println!("{}", input);
+        } else {
+            println!("{}: command not found", input);
+        }
     }
 }
