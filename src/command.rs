@@ -27,9 +27,9 @@ pub struct Command {
 
 impl Command {
     pub fn new(parts: &Vec<String>) -> Self {
-        if parts.len() == 0 {
-            return Command::default();
-        }
+        // if parts.len() == 0 {
+        //     return Command::default();
+        // }
 
         let cmd = parts[0].to_lowercase();
 
@@ -45,28 +45,16 @@ impl Command {
 
         match cmd.as_str() {
             "type" => {
-                if parts.len() < 2 {
-                    return result;
-                }
-
                 result.command_type = Type::Type;
                 result.build_type = BuildType::Builtin;
                 result.parameters = parts[1..].to_vec();
             }
             "echo" => {
-                if parts.len() < 2 {
-                    return result;
-                }
-
                 result.command_type = Type::Echo;
                 result.build_type = BuildType::Builtin;
                 result.parameters = parts[1..].to_vec();
             }
             "exit" => {
-                if parts.len() < 2 {
-                    return result;
-                }
-
                 result.command_type = Type::Exit;
                 result.build_type = BuildType::Builtin;
                 result.parameters = parts[1..].to_vec();
@@ -90,21 +78,24 @@ impl Command {
                 }
             }
             Type::Exit => {
-                // process::exit(1);
-                process::abort();
+                process::exit(0);
             }
             Type::Invalid => {
                 print!("{}: command not found", self.parameters[0]);
             }
-            Type::Type => match self.build_type {
-                BuildType::Builtin => {
-                    print!("{} is a shell builtin", self.parameters[0]);
+            Type::Type => {
+                let arg_com = Command::new(&self.parameters.to_vec());
+
+                match arg_com.build_type {
+                    BuildType::Builtin => {
+                        print!("{} is a shell builtin", self.parameters[0]);
+                    }
+                    BuildType::NoFound => {
+                        print!("{}: not found", self.parameters[0])
+                    }
+                    _ => {}
                 }
-                BuildType::NoFound => {
-                    print!("{}: not found", self.parameters[0])
-                }
-                _ => {}
-            },
+            }
             Type::Unknown => {}
         }
         println!();
