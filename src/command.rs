@@ -1,40 +1,43 @@
-enum Command {
-    Echo { message: String },
+#[derive(Clone, Debug)]
+pub enum Command {
+    Echo { message: Vec<String> },
     Invalid,
     Exit { message: String },
     Unknown(Vec<String>),
 }
 
 impl Command {
-    fn parse(resp: &[String]) -> Self {
-        let cmd = resp[0].to_lowercase();
+    pub fn parse(parts: &Vec<String>) -> Self {
+        let cmd = parts[0].to_lowercase();
+
+        if cmd.starts_with("invalid") {
+            if parts.len() == 1 {
+                return Command::Invalid;
+            } else {
+                return Command::Unknown(parts.to_vec());
+            }
+        }
 
         match cmd.as_str() {
             "echo" => {
-                if resp.len() != 2 {
-                    return Command::Unknown(resp.to_vec());
+                if parts.len() < 2 {
+                    return Command::Unknown(parts.clone());
                 }
 
-                let message = resp[1].clone();
-                Command::Echo { message }
+                Command::Echo {
+                    message: parts[1..].to_vec(),
+                }
             }
             "exit" => {
-                if resp.len() != 2 {
-                    return Command::Unknown(resp.to_vec());
+                if parts.len() != 2 {
+                    return Command::Unknown(parts.to_vec());
                 }
 
-                let message = resp[1].clone();
+                let message = parts[1].clone();
                 Command::Exit { message }
             }
-            "invalid" => {
-                if resp.len() == 1 {
-                    return Command::Invalid;
-                } else {
-                    return Command::Unknown(resp.to_vec());
-                }
-            }
             _ => {
-                return Command::Unknown(resp.to_vec());
+                return Command::Unknown(parts.to_vec());
             }
         }
     }

@@ -3,6 +3,8 @@ mod command;
 #[allow(unused_imports)]
 use std::io::{self, Write};
 
+use command::Command;
+
 fn main() {
     loop {
         print!("$ ");
@@ -12,16 +14,30 @@ fn main() {
 
         let mut input = String::new();
         stdin.read_line(&mut input).unwrap();
-
         let input = input.trim();
 
-        if input.starts_with("exit") {
-            break;
+        let parts: Vec<String> = input.split_whitespace().map(String::from).collect();
+        let command: Command = Command::parse(&parts);
+
+        match command {
+            Command::Echo { message } => {
+                for (index, item) in message.iter().enumerate() {
+                    print!("{}", item);
+
+                    if index != message.len() - 1 {
+                        print!(" ");
+                    }
+                }
+            }
+            Command::Exit { message } => {
+                break;
+            }
+            Command::Invalid => {
+                print!("{}: command not found", input);
+            }
+            _ => {}
         }
-        if !input.starts_with("invalid") {
-            println!("{}", input);
-        } else {
-            println!("{}: command not found", input);
-        }
+
+        println!();
     }
 }
