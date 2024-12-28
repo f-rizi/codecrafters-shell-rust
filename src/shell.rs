@@ -52,6 +52,9 @@ impl Shell {
             command.execute(self, args);
         } else if let Some(path) = self.is_external(cmd) {
             self.execute_external(cmd, &path, &args);
+        } else {
+            let message = format!("{}: not found\n", cmd);
+            self.write_output(&message);
         }
     }
 
@@ -88,28 +91,17 @@ impl Shell {
     pub fn write_output(&self, message: &str) {
         match &self.output {
             Output::Std => {
-                println!("{}", message);
+                print!("{}", message);
             }
             Output::File(file_path) => {
-                let has_content = Path::new(file_path)
-                    .metadata()
-                    .map(|m| m.len() > 0)
-                    .unwrap_or(false);
-
                 if let Ok(mut file) = OpenOptions::new()
                     .create(true)
                     .write(true)
                     .append(true)
                     .open(file_path)
                 {
-                    if has_content {
-                        if let Err(e) = writeln!(file, "{}", message) {
-                            //eprintln!("Failed to write to error file {}: {}", file_path, e);
-                        }
-                    } else {
-                        if let Err(e) = write!(file, "{}", message) {
-                            //eprintln!("Failed to write to error file {}: {}", file_path, e);
-                        }
+                    if let Err(e) = write!(file, "{}", message) {
+                        //eprintln!("Failed to write to error file {}: {}", file_path, e);
                     }
                 } else {
                     //eprintln!("Failed to open error file: {}", file_path);
@@ -121,28 +113,17 @@ impl Shell {
     pub fn write_error(&self, message: &str) {
         match &self.error_output {
             ErrorOutput::Std => {
-                println!("{}", message);
+                print!("{}", message);
             }
             ErrorOutput::File(file_path) => {
-                let has_content = Path::new(file_path)
-                    .metadata()
-                    .map(|m| m.len() > 0)
-                    .unwrap_or(false);
-
                 if let Ok(mut file) = OpenOptions::new()
                     .create(true)
                     .write(true)
                     .append(true)
                     .open(file_path)
                 {
-                    if has_content {
-                        if let Err(e) = writeln!(file, "{}", message) {
-                            //eprintln!("Failed to write to error file {}: {}", file_path, e);
-                        }
-                    } else {
-                        if let Err(e) = write!(file, "{}", message) {
-                            //eprintln!("Failed to write to error file {}: {}", file_path, e);
-                        }
+                    if let Err(e) = write!(file, "{}", message) {
+                        //eprintln!("Failed to write to error file {}: {}", file_path, e);
                     }
                 } else {
                     //eprintln!("Failed to open error file: {}", file_path);

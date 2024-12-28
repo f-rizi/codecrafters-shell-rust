@@ -19,7 +19,8 @@ impl Command for LS {
                     files.sort_by_key(|e| e.file_name().to_str().unwrap().to_string());
 
                     for entry in files {
-                        shell.write_output(entry.file_name().to_str().unwrap());
+                        let message = entry.file_name().to_str().unwrap().to_string() + "\n";
+                        shell.write_output(&message);
                     }
                 }
                 Err(e) => {

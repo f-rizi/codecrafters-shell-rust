@@ -11,17 +11,17 @@ impl Command for TypeCmd {
 
         let cmd = &args[0];
         if shell.is_builtin(cmd) {
-            let message = format!("{} is a shell builtin", cmd);
+            let message = format!("{} is a shell builtin\n", cmd);
             shell.write_output(&message);
             return;
         }
         if let Some(path) = shell.is_external(cmd) {
-            let message = format!("{} is {}", cmd, path);
+            let message = format!("{} is {}\n", cmd, path);
             shell.write_output(&message);
             return;
         } else {
-            let message = format!("{}: not found", cmd);
-            //shell.write_error(&message);
+            let message = format!("{}: not found\n", cmd);
+            shell.write_output(&message);
         }
     }
 
