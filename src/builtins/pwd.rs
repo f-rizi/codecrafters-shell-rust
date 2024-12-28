@@ -1,7 +1,6 @@
-use std::{env, process};
-
 use crate::shell::Shell;
 use crate::Command;
+use std::env;
 
 pub struct PWD;
 

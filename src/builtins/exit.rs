@@ -1,7 +1,6 @@
-use std::process;
-
 use crate::shell::Shell;
 use crate::Command;
+use std::process;
 
 pub struct Exit;
 

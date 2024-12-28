@@ -1,6 +1,5 @@
-use crate::Command;
-
 use crate::shell::Shell;
+use crate::Command;
 
 pub struct TypeCmd;
 

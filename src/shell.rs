@@ -1,8 +1,6 @@
-use std::collections::HashMap;
-
-use std::process::Command as SysCommand;
-
 use crate::{builtins, command::Command};
+use std::collections::HashMap;
+use std::process::Command as SysCommand;
 
 pub struct Shell {
     pub paths: Vec<String>,
@@ -16,6 +14,7 @@ impl Shell {
         builtins.insert("exit".to_string(), Box::new(builtins::exit::Exit));
         builtins.insert("type".to_string(), Box::new(builtins::type_cmd::TypeCmd));
         builtins.insert("pwd".to_string(), Box::new(builtins::pwd::PWD));
+        builtins.insert("cd".to_string(), Box::new(builtins::cd::CD));
 
         Self { paths, builtins }
     }

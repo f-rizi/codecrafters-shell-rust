@@ -4,7 +4,6 @@ mod shell;
 
 use command::Command;
 use shell::Shell;
-#[allow(unused_imports)]
 use std::io::{self, Write};
 
 fn main() {
