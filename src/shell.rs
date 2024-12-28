@@ -1,5 +1,7 @@
 use std::collections::HashMap;
 
+use std::process::Command as SysCommand;
+
 use crate::{builtins, command::Command};
 
 pub struct Shell {
@@ -36,11 +38,24 @@ impl Shell {
         if let Some(command) = self.builtins.get(cmd) {
             command.execute(self, args);
         } else if let Some(path) = self.is_external(cmd) {
-            self.execute_external(cmd, args);
+            self.execute_external(cmd, &path, &args);
         } else {
             println!("{}: not found", cmd);
         }
     }
 
-    pub fn execute_external(&self, cmd: &str, args: &[String]) {}
+    pub fn execute_external(&self, cmd: &str, path: &String, args: &[String]) {
+        let status = SysCommand::new(&path).args(args).status();
+
+        match status {
+            Ok(status) => {
+                if !status.success() {
+                    eprintln!("{} exited with status {}", cmd, status);
+                }
+            }
+            Err(e) => {
+                eprintln!("Failed to execute {}: {}", cmd, e);
+            }
+        }
+    }
 }
