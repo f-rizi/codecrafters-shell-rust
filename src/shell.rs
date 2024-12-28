@@ -15,6 +15,7 @@ impl Shell {
         builtins.insert("echo".to_string(), Box::new(builtins::echo::Echo));
         builtins.insert("exit".to_string(), Box::new(builtins::exit::Exit));
         builtins.insert("type".to_string(), Box::new(builtins::type_cmd::TypeCmd));
+        builtins.insert("pwd".to_string(), Box::new(builtins::pwd::PWD));
 
         Self { paths, builtins }
     }
