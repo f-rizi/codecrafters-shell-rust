@@ -83,7 +83,6 @@ impl Shell {
                 }
             }
         }
-        //println!();
     }
 
     pub fn write_output(&self, message: &str) {
@@ -104,7 +103,7 @@ impl Shell {
                     .open(file_path)
                 {
                     if has_content {
-                        if let Err(e) = write!(file, "{}", message) {
+                        if let Err(e) = writeln!(file, "{}", message) {
                             //eprintln!("Failed to write to error file {}: {}", file_path, e);
                         }
                     } else {
