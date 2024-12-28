@@ -1,0 +1,46 @@
+use std::collections::HashMap;
+
+use crate::{builtins, command::Command};
+
+pub struct Shell {
+    pub paths: Vec<String>,
+    pub builtins: HashMap<String, Box<dyn Command>>,
+}
+
+impl Shell {
+    pub fn new(paths: Vec<String>) -> Self {
+        let mut builtins: HashMap<String, Box<dyn Command>> = HashMap::new();
+        builtins.insert("echo".to_string(), Box::new(builtins::echo::Echo));
+        builtins.insert("exit".to_string(), Box::new(builtins::exit::Exit));
+        builtins.insert("type".to_string(), Box::new(builtins::type_cmd::TypeCmd));
+
+        Self { paths, builtins }
+    }
+
+    pub fn is_builtin(&self, cmd: &str) -> bool {
+        self.builtins.contains_key(cmd)
+    }
+
+    pub fn is_external(&self, cmd: &str) -> Option<String> {
+        for path in &self.paths {
+            let cmd_path = format!("{}/{}", path, cmd);
+            if std::fs::metadata(&cmd_path).is_ok() {
+                return Some(cmd_path);
+            }
+        }
+
+        return None;
+    }
+
+    pub fn execute_command(&self, cmd: &str, args: &[String]) {
+        if let Some(command) = self.builtins.get(cmd) {
+            command.execute(self, args);
+        } else if let Some(path) = self.is_external(cmd) {
+            self.execute_external(cmd, args);
+        } else {
+            println!("{}: not found", cmd);
+        }
+    }
+
+    pub fn execute_external(&self, cmd: &str, args: &[String]) {}
+}
