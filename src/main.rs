@@ -4,6 +4,7 @@ mod shell;
 
 use command::Command;
 use shell::Shell;
+use shell_words::split;
 use std::io::{self, Write};
 
 fn main() {
@@ -26,7 +27,14 @@ fn main() {
             continue;
         }
 
-        let parts: Vec<String> = input.split_whitespace().map(String::from).collect();
+        let parts = match split(input) {
+            Ok(parts) => parts,
+            Err(e) => {
+                eprintln!("Failed to parse input: {}", e);
+                continue;
+            }
+        };
+
         let cmd = &parts[0];
         let args = &parts[1..];
         shell.execute_command(cmd, args);
