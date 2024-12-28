@@ -72,10 +72,10 @@ impl Shell {
                             error_message = error_message.replacen(&path_prefix, &cmd_prefix, 1);
                         }
 
-                        self.write_error(&error_message.trim());
+                        self.write_error(&error_message);
                     } else {
                         let output_message = String::from_utf8_lossy(&output.stdout);
-                        self.write_output(&output_message.trim());
+                        self.write_output(&output_message);
                     }
                 }
                 Err(e) => {
@@ -136,7 +136,7 @@ impl Shell {
                     .open(file_path)
                 {
                     if has_content {
-                        if let Err(e) = write!(file, "{}", message) {
+                        if let Err(e) = writeln!(file, "{}", message) {
                             //eprintln!("Failed to write to error file {}: {}", file_path, e);
                         }
                     } else {
