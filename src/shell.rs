@@ -104,7 +104,7 @@ impl Shell {
                     .open(file_path)
                 {
                     if has_content {
-                        if let Err(e) = write!(file, "\n{}", message) {
+                        if let Err(e) = write!(file, "{}", message) {
                             //eprintln!("Failed to write to error file {}: {}", file_path, e);
                         }
                     } else {
