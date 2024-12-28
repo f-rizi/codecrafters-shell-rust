@@ -5,7 +5,7 @@ use std::process;
 pub struct Exit;
 
 impl Command for Exit {
-    fn execute(&self, _shell: &Shell, args: &[String]) {
+    fn execute(&self, _shell: &Shell, _args: &[String]) {
         process::exit(0);
     }
 

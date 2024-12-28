@@ -4,8 +4,9 @@ use crate::Command;
 pub struct Echo;
 
 impl Command for Echo {
-    fn execute(&self, _shell: &Shell, args: &[String]) {
-        println!("{}", args.join(" "));
+    fn execute(&self, shell: &Shell, args: &[String]) {
+        let result = args.join(" ").to_string();
+        shell.write_output(&result.as_str());
     }
 
     fn name(&self) -> &str {

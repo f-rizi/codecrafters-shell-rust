@@ -5,10 +5,13 @@ use std::env;
 pub struct PWD;
 
 impl Command for PWD {
-    fn execute(&self, _shell: &Shell, args: &[String]) {
+    fn execute(&self, shell: &Shell, args: &[String]) {
         match env::current_dir() {
-            Ok(path) => println!("{}", path.display()),
-            Err(e) => eprintln!("Error getting current directory: {}", e),
+            Ok(path) => {
+                let message = path.display();
+                shell.write_output(&message.to_string());
+            }
+            Err(e) => {}
         }
     }
 
