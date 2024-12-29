@@ -74,7 +74,7 @@ fn main() {
             shell.output = output::Output::Std;
         }
 
-        if args.contains(&String::from("2>")) {
+        if args.contains(&String::from("2>>")) || args.contains(&String::from("2>")) {
             let file_path = args.last().unwrap().clone();
             let path = Path::new(&file_path);
             if let Some(parent) = path.parent() {
