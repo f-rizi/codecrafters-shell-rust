@@ -5,12 +5,14 @@ use std::fs;
 pub struct LS;
 
 impl Command for LS {
-    fn execute(&self, shell: &Shell, args: &[String]) {
+    fn execute(&self, shell: &Shell, args: &[String], append_output: bool, append_error: bool) {
         let dirs_to_list = if args.is_empty() {
             vec![shell.get_current_dir()]
         } else {
             args.iter().map(|dir| shell.resolve_path(dir)).collect()
         };
+
+        let mut final_message = String::from("");
 
         for (i, dir) in dirs_to_list.iter().enumerate() {
             match fs::read_dir(dir) {
@@ -20,7 +22,7 @@ impl Command for LS {
 
                     for entry in files {
                         let message = entry.file_name().to_str().unwrap().to_string() + "\n";
-                        shell.write_output(&message);
+                        final_message.push_str(&message);
                     }
                 }
                 Err(e) => {
@@ -32,10 +34,13 @@ impl Command for LS {
                         .to_string();
 
                     let formatted_error = format!("ls: {}: {}\n", args[i], error_description);
-                    shell.write_error(&formatted_error);
+                    shell.write_error(&formatted_error, append_error);
+                    return;
                 }
             }
         }
+
+        shell.write_output(&final_message, append_output);
     }
 
     fn name(&self) -> &str {

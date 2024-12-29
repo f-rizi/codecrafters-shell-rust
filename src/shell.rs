@@ -48,18 +48,31 @@ impl Shell {
         return None;
     }
 
-    pub fn execute_command(&self, cmd: &str, args: &[String]) {
+    pub fn execute_command(
+        &self,
+        cmd: &str,
+        args: &[String],
+        append_output: bool,
+        append_error: bool,
+    ) {
         if let Some(command) = self.builtins.get(cmd) {
-            command.execute(self, args);
+            command.execute(self, args, append_output, append_error);
         } else if let Some(path) = self.is_external(cmd) {
-            self.execute_external(cmd, &path, &args);
+            self.execute_external(cmd, &path, &args, append_output, append_error);
         } else {
             let message = format!("{}: not found\n", cmd);
-            self.write_output(&message);
+            self.write_output(&message, append_output);
         }
     }
 
-    pub fn execute_external(&self, cmd: &str, path: &String, args: &[String]) {
+    pub fn execute_external(
+        &self,
+        cmd: &str,
+        path: &String,
+        args: &[String],
+        append_output: bool,
+        append_error: bool,
+    ) {
         for arg in args {
             let temp_args = vec![arg];
             let output = SysCommand::new(&path).args(temp_args).output();
@@ -76,19 +89,18 @@ impl Shell {
                             error_message = error_message.replacen(&path_prefix, &cmd_prefix, 1);
                         }
 
-                        self.write_error(&error_message);
+                        self.write_error(&error_message, append_error);
                     } else {
                         let output_message = String::from_utf8_lossy(&output.stdout);
-                        self.write_output(&output_message);
+                        self.write_output(&output_message, append_output);
                     }
                 }
-                Err(e) => {
-                }
+                Err(e) => {}
             }
         }
     }
 
-    pub fn write_output(&self, message: &str) {
+    pub fn write_output(&self, message: &str, append_output: bool) {
         match &self.output {
             Output::Std => {
                 print!("{}", message);
@@ -97,18 +109,17 @@ impl Shell {
                 if let Ok(mut file) = OpenOptions::new()
                     .create(true)
                     .write(true)
-                    .append(true)
+                    .append(append_output)
                     .open(file_path)
                 {
-                    if let Err(e) = write!(file, "{}", message) {
-                    }
+                    if let Err(e) = write!(file, "{}", message) {}
                 } else {
                 }
             }
         }
     }
 
-    pub fn write_error(&self, message: &str) {
+    pub fn write_error(&self, message: &str, append_error: bool) {
         match &self.error_output {
             ErrorOutput::Std => {
                 print!("{}", message);
@@ -118,15 +129,11 @@ impl Shell {
                 match OpenOptions::new()
                     .create(true)
                     .write(true)
-                    .append(true)
+                    .append(append_error)
                     .open(path)
                 {
-                    Err(e) => {
-                    }
-                    Ok(mut file) => {
-                        if let Err(e) = write!(file, "{}", message) {
-                        }
-                    }
+                    Err(e) => {}
+                    Ok(mut file) => if let Err(e) = write!(file, "{}", message) {},
                 }
             }
         }

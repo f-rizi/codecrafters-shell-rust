@@ -5,7 +5,7 @@ use std::env;
 pub struct CD;
 
 impl Command for CD {
-    fn execute(&self, _shell: &Shell, args: &[String]) {
+    fn execute(&self, _shell: &Shell, args: &[String], append_output: bool, append_error: bool) {
         if args.is_empty() {
             println!("type: missing argument");
             return;

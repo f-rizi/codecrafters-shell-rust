@@ -43,25 +43,44 @@ fn main() {
         let mut args: &[String] = &parts[1..];
         let mut args2: &[String] = &parts[1..];
 
-        if args.contains(&String::from(">")) || args.contains(&String::from("1>")) {
+        let mut append_error = false;
+        let mut append_output = false;
+
+        if args.contains(&String::from(">>")) || args.contains(&String::from("1>>")) {
+            append_output = true;
+        }
+
+        if args.contains(&String::from("2>>")) {
+            append_error = true;
+        }
+
+        if args.contains(&String::from(">"))
+            || args.contains(&String::from("1>"))
+            || args.contains(&String::from(">>"))
+            || args.contains(&String::from("1>>"))
+        {
+            let file_path = args.last().unwrap().clone();
+            let path = Path::new(&file_path);
+            if let Some(parent) = path.parent() {
+                if let Err(e) = std::fs::create_dir_all(parent) {
+                } else {
+                    let mut file = OpenOptions::new().create(true).write(true).open(path);
+                }
+            }
+
             shell.output = output::Output::File(args.last().unwrap().clone());
             args = &args2[0..args.len() - 2];
         } else {
             shell.output = output::Output::Std;
         }
 
-        if args.contains(&String::from(">>")) || args.contains(&String::from("2>")) {
+        if args.contains(&String::from("2>")) {
             let file_path = args.last().unwrap().clone();
             let path = Path::new(&file_path);
             if let Some(parent) = path.parent() {
                 if let Err(e) = std::fs::create_dir_all(parent) {
-
                 } else {
-                    let mut file = OpenOptions::new()
-                        .create(true)
-                        .write(true)
-                        .append(true)
-                        .open(path);
+                    let mut file = OpenOptions::new().create(true).write(true).open(path);
                 }
             }
 
@@ -71,6 +90,6 @@ fn main() {
             shell.error_output = error_output::ErrorOutput::Std;
         }
 
-        shell.execute_command(cmd, args);
+        shell.execute_command(cmd, args, append_output, append_error);
     }
 }
