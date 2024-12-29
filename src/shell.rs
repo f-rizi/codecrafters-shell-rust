@@ -2,6 +2,7 @@ use crate::error_output::ErrorOutput;
 use crate::output::Output;
 use crate::{builtins, command::Command};
 use std::collections::HashMap;
+use std::fs::create_dir_all;
 use std::fs::OpenOptions;
 use std::io::Write;
 use std::path::Path;
@@ -82,7 +83,6 @@ impl Shell {
                     }
                 }
                 Err(e) => {
-                    self.write_error(&format!("Failed to execute command: {}", e));
                 }
             }
         }
@@ -101,10 +101,8 @@ impl Shell {
                     .open(file_path)
                 {
                     if let Err(e) = write!(file, "{}", message) {
-                        //eprintln!("Failed to write to error file {}: {}", file_path, e);
                     }
                 } else {
-                    //eprintln!("Failed to open error file: {}", file_path);
                 }
             }
         }
@@ -116,17 +114,19 @@ impl Shell {
                 print!("{}", message);
             }
             ErrorOutput::File(file_path) => {
-                if let Ok(mut file) = OpenOptions::new()
+                let path = Path::new(file_path);
+                match OpenOptions::new()
                     .create(true)
                     .write(true)
                     .append(true)
-                    .open(file_path)
+                    .open(path)
                 {
-                    if let Err(e) = write!(file, "{}", message) {
-                        //eprintln!("Failed to write to error file {}: {}", file_path, e);
+                    Err(e) => {
                     }
-                } else {
-                    //eprintln!("Failed to open error file: {}", file_path);
+                    Ok(mut file) => {
+                        if let Err(e) = write!(file, "{}", message) {
+                        }
+                    }
                 }
             }
         }

@@ -7,7 +7,11 @@ mod shell;
 use command::Command;
 use shell::Shell;
 use shell_words::split;
-use std::io::{self, Write};
+use std::{
+    fs::OpenOptions,
+    io::{self, Write},
+    path::Path,
+};
 
 fn main() {
     let path_env = std::env::var("PATH").unwrap_or_else(|_| String::from(""));
@@ -46,8 +50,22 @@ fn main() {
             shell.output = output::Output::Std;
         }
 
-        if args.contains(&String::from(">>")) || args.contains(&String::from("2>>")) {
-            shell.error_output = error_output::ErrorOutput::File(args.last().unwrap().clone());
+        if args.contains(&String::from(">>")) || args.contains(&String::from("2>")) {
+            let file_path = args.last().unwrap().clone();
+            let path = Path::new(&file_path);
+            if let Some(parent) = path.parent() {
+                if let Err(e) = std::fs::create_dir_all(parent) {
+
+                } else {
+                    let mut file = OpenOptions::new()
+                        .create(true)
+                        .write(true)
+                        .append(true)
+                        .open(path);
+                }
+            }
+
+            shell.error_output = error_output::ErrorOutput::File(file_path);
             args = &args2[0..args.len() - 2];
         } else {
             shell.error_output = error_output::ErrorOutput::Std;

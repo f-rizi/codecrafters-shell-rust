@@ -24,7 +24,15 @@ impl Command for LS {
                     }
                 }
                 Err(e) => {
-                    //shell.write_error(&format!("ls: cannot access '{}': {}", dir.display(), e));
+                    let error_description = e
+                        .to_string()
+                        .split(" (")
+                        .next()
+                        .unwrap_or(&e.to_string())
+                        .to_string();
+
+                    let formatted_error = format!("ls: {}: {}\n", args[i], error_description);
+                    shell.write_error(&formatted_error);
                 }
             }
         }
